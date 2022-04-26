@@ -1,0 +1,403 @@
+---
+title: "Statistical description of iris data"
+author: "Bryan Tchakote"
+date: "12/12/2020"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+library(moments)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+# Description of the data set
+
+```{r}
+?iris
+```
+
+According to the help, **iris** data set gives the measurements in centimeters of the variables **sepal length and width and petal**
+**length and width**, respectively, for 50 flowers from each of 3 species of iris. The species are **Iris setosa, versicolor, and**
+**virginica**.
+
+```{r}
+dim(iris)
+```
+```{r}
+colnames(iris)
+```
+
+**iris** is a data set of 150 rows (observations) and 5 columns (variables) which are:
+
+- Sepal.Length
+- Sepal.Width
+- Petal.Length
+- Petal.Width
+- Species
+
+
+
+# Univariate analysis
+
+- Personnalized fonctions used for the univariate analysis
+
+```{r Personnalized_fonctions_used_for_the_univariate_analysis}
+numeric_summary = function(current_col){
+  current_col_summary = c()
+  
+  assign_and_name = function(fun, name){
+    x = fun
+    names(x) = name
+    current_col_summary = append(current_col_summary, x)
+    return (current_col_summary)
+  }
+  
+  # Measures of central location
+  current_col_summary = assign_and_name(as.vector(summary(current_col)),
+  names(summary(current_col)))
+  
+  
+  # Measures of dispersion
+  
+  ## Range and Interquartile range
+  current_col_summary = assign_and_name(current_col_summary[6] - current_col_summary[1],
+  "Range")
+  
+  current_col_summary = assign_and_name(current_col_summary[5] - current_col_summary[2],
+  "Interquartile range")
+  
+  ## Variance & Standard deviation
+  current_col_summary = assign_and_name((var(current_col)*(length(current_col) - 1)) /
+  length(current_col), "Variance")
+  
+  current_col_summary = assign_and_name(sd(current_col), "Standard deviation")
+  
+  
+  # Skewness & Kurtosis
+  current_col_summary = assign_and_name(skewness(current_col), "Skewness (Fisher)")
+  current_col_summary = assign_and_name(kurtosis(current_col) - 3, "Kurtosis (Fisher)")
+  
+  current_col_summary = data.frame(current_col_summary)
+  names(current_col_summary) = colnames(current_col)
+  
+  return (current_col_summary)
+}
+
+sk_and_kt_comments = function(sk, kt){
+  if (sk < 0 ) {
+    sk_c = "The distribution is negatively skewed, the mass of the
+    distribution is concentrated on the right of the mean value.\n\n"
+  } else if (sk > 0) {
+    sk_c = "The distribution is positively skewed, the mass of the
+    distribution is concentrated on the left of the mean value.\n\n"
+  } else {
+    sk_c = "The values are evenly distributed on both sides of the mean.\n\n"
+  }
+  
+  if (kt < 0) {
+    kt_c = "The distribution is platykurtic, according to the negative value of the
+    kurtosis"
+  } else if (kt > 0) {
+    kt_c = "The distribution is leptokurtic, according to the positive value of
+    the kurtosis"
+  } else {
+    kt_c = "The distribution is mesokurtic, the kurtosis value is zero"
+  }
+  
+  return (c("Comment on the skewness\n", sk_c, "Comment on the kurtosis\n", kt_c))
+}
+
+graphic_summary = function(current_col){
+  par(mfrow = c(1, 2))
+  
+  plot(table(current_col), xlab = colnames(current_col), ylab = "Occurences",
+  col = "lightblue")
+  
+  boxplot(current_col, ylab = colnames(current_col), col = "lightblue",
+  border = "darkgreen")
+  
+  par(mfrow = c(1, 1))
+  
+  plot(ecdf(current_col), main = colnames(current_col), col = "darkgreen")
+}
+```
+
+
+## Sepal.Length
+
+### Numeric summary
+
+```{r}
+S_L_summary = numeric_summary(iris[, 1])
+S_L_summary
+```
+
+**Comments (about the skewness and the kurtosis especially):**
+
+```{r}
+sk_and_kt_comments(S_L_summary[[11, 1]], S_L_summary[[12, 1]])
+```
+
+### Graphic summary
+
+```{r}
+graphic_summary(iris[, 1])
+```
+
+
+## Sepal.Width
+
+### Numeric summary
+
+```{r}
+S_W_summary = numeric_summary(iris[, 2])
+S_W_summary
+```
+
+**Comments (about the skewness and the kurtosis especially):**
+
+```{r}
+sk_and_kt_comments(S_W_summary[[11, 1]], S_W_summary[[12, 1]])
+```
+
+### Graphic summary
+
+```{r}
+graphic_summary(iris[, 2])
+```
+
+
+## Petal.Length
+
+### Numeric summary
+
+```{r}
+P_L_summary = numeric_summary(iris[, 3])
+P_L_summary
+```
+
+**Comments (about the skewness and the kurtosis especially):**
+
+```{r}
+sk_and_kt_comments(P_L_summary[[11, 1]], P_L_summary[[12, 1]])
+```
+
+### Graphic summary
+
+```{r}
+graphic_summary(iris[, 3])
+```
+
+
+## Petal.Width
+
+### Numeric summary
+
+```{r}
+P_W_summary = numeric_summary(iris[, 4])
+P_W_summary
+```
+
+**Comments (about the skewness and the kurtosis especially):**
+
+```{r}
+sk_and_kt_comments(P_W_summary[[11, 1]], P_W_summary[[12, 1]])
+```
+
+### Graphic summary
+
+```{r}
+graphic_summary(iris[, 4])
+```
+
+
+## Species
+
+```{r}
+summary(iris$Species)
+```
+
+
+
+# Bivariate analysis
+
+
+## Correlation between quantitatives variables
+
+- Personnalized fonctions used for the bivariate analysis
+
+```{r}
+bivariate_analysis = function(col_X, col_Y){
+  # Variables and respective marginal properties
+  x_bar = mean(col_X)
+  var_x = var(col_X) * ((length(col_X) - 1) / length(col_X))
+  sd_x = sd(col_X)
+  
+  y_bar = mean(col_Y)
+  sd_y = sd(col_Y)
+  
+  # Covariance
+  cov_xy = cov(col_X, col_Y)
+  
+  # Correlation
+  r_xy = cov_xy / (sd_x * sd_y)
+
+  # Linear regression line (y = a + bx) - Coefficients a & b
+  b = cov_xy / var_x
+  a = y_bar - b*x_bar
+  
+  return (c(cov_xy, r_xy, a, b))
+}
+
+bivariate_graphs = function(X, Y, a, b){
+  col_X = iris[, X]
+  col_Y = iris[, Y]
+  
+  # Scatterplot
+  plot(col_X, col_Y, col = "lightblue", pch = 20, xlab = names(iris)[X], ylab = names(iris)[Y],
+  main = c("Scatterplot of", names(iris)[Y], "against", names(iris)[X]))
+  
+  # Linear regression line (actual line)
+  abline(a, b, col = "darkgreen")
+}
+```
+
+
+### Sepal.Length & Sepal.Width
+
+Let:
+
+- **Sepal.Length** be the *explanatory variable* (X)
+- **Sepal.Width** be the *outcome variable* (Y)
+
+```{r}
+SL_SW_bivariate_analysis = bivariate_analysis(iris$Sepal.Length, iris$Sepal.Width)
+```
+
+
+#### Scatterplot
+
+```{r}
+# The scatterplot is going to be drawn lower, with the linear regression line
+```
+
+**Comment:** *A priori, the two variables seem to have a weak linear relationship. Let's verify it by calculating joint properties.*
+
+
+#### Covariance & Correlation
+
+- Covariance ($S_{xy}$)
+
+```{r}
+SL_SW_bivariate_analysis[1]
+```
+
+- Correlation coefficient ($r_{xy}$)
+
+```{r}
+SL_SW_bivariate_analysis[2]
+```
+
+**Comment:** *As expected, this correlation coefficient close to zero shows that the linear link between 'Sepal.Length' and 'Sepal.Width' is very weak*
+
+
+#### Linear regression (y = a + bx)
+
+```{r}
+a = SL_SW_bivariate_analysis[3]
+b = SL_SW_bivariate_analysis[4]
+
+cat("Linear regression line equation:\ny =", a, "+", b, "x")
+
+bivariate_graphs(1, 2, a, b)
+```
+
+
+
+### Petal.Length & Petal.Width
+
+Let:
+
+- **Petal.Length** be the *explanatory variable* (X)
+- **Petal.Width** be the *outcome variable* (Y)
+
+```{r}
+PL_PW_bivariate_analysis = bivariate_analysis(iris$Petal.Length, iris$Sepal.Width)
+```
+
+
+#### Scatterplot
+
+```{r}
+# The scatterplot is going to be drawn lower, with the linear regression line
+```
+
+**Comment:** *A priori, the two variables seem to have a strong linear relationship. Let's verify it by calculating joint properties.*
+
+
+#### Covariance & Correlation
+
+- Covariance ($S_{xy}$)
+
+```{r}
+PL_PW_bivariate_analysis[1]
+```
+
+- Correlation coefficient ($r_{xy}$)
+
+```{r}
+PL_PW_bivariate_analysis[2]
+```
+
+**Comment:** *As expected, this correlation coefficient close to one shows that the linear link between 'Petal.Length' and 'Petal.Width' is very strong*
+
+
+#### Linear regression (y = a + bx)
+
+```{r}
+a = PL_PW_bivariate_analysis[3]
+b = PL_PW_bivariate_analysis[4]
+
+cat("Linear regression line equation:\ny =", a, "+", b, "x")
+
+bivariate_graphs(3, 4, a, b)
+```
+
+
+
+
+## Correlation between each quantitative variable and the only factor
+
+
+
+
+### Sepal.Length & Species
+
+
+#### Numeric summary
+
+```{r}
+S_L_summary_by_S = tapply(iris$Sepal.Length, iris$Species, numeric_summary)
+S_L_summary_by_S = as.data.frame(S_L_summary_by_S, row.names = row.names(S_L_summary))
+
+S_L_summary_by_S
+```
+
+
+#### Graphic summary
+
+```{r}
+tapply(iris$Sepal.Length, iris$Species, graphic_summary)
+boxplot(iris$Sepal.Length ~ iris$Species, col = "lightblue", border = "darkgreen", xlab = "Species", ylab = names(iris)[1])
+
+```

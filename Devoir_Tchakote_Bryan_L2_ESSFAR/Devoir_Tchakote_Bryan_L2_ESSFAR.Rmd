@@ -1,0 +1,176 @@
+---
+title: "Devoir R"
+author: "Bryan Tchakote"
+date: "11/30/2020"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    number_sections: yes
+  word_document:
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    number_sections: yes
+---
+
+# Exercice 2.2.1
+
+```{r}
+# On considère deux variables x et y reliées par la relation
+# y = (2/3)*x^3 − (1/2)*x − 5.
+
+# 1. Fonction formule y.val prenant en entrée x et renvoyant la valeur de y correspondante.
+y.val = function(x) return((2/3)*x^3 - (1/2)*x - 5)
+
+# 2. Vecteur vecy des valeurs de y associées aux valeurs -2, 1.7, 3, 10, -7 de x.
+vecy = y.val(c(-2, 1.7, 3, 10, -7))
+vecy
+```
+
+
+# Exercice 2.2.2 (Nombres premiers)
+
+```{r}
+# 1. Fonction 'premier' prenant en entrée un entier naturel n et renvoyant TRUE si n est
+#    premier et FALSE sinon.
+premier = function(n)
+{
+  if(n < 2) return (FALSE)
+  if(n == 2) return (TRUE)
+  for(i in 2:sqrt(n))
+    if((n %% i) == 0) return (FALSE)
+  return (TRUE)
+}
+
+# Vectorisation de la fonction 'premier'
+# sapply(v, FUN)
+# v -> vecteur
+# FUN -> fonction a appliquer a chaque element du vecteur
+premier_v = function(n) return (sapply(n, premier))
+
+# 2. Nombres premiers ≤ 100.
+which(premier_v(1:100))
+```
+
+
+# Exercice 2.3.1 (is.na, tapply)
+
+```{r}
+# 1.1. Description du jeu de données 'airquality'.
+?airquality
+## 'airquality' est un jeu de données sous R décrivant la qualité journalière de l'air
+## dans l'Etat de New-York (USA) de mai à septembre 1973
+```
+
+```{r}
+# 1.2. Premières lignes du jeu de données
+head(airquality)
+
+# 1.3 Dimensions du tableau de données
+dim(airquality)
+
+## 153 lignes et 6 colonnes
+```
+
+```{r}
+# 2. Nombre de valeurs manquantes pour la concentration d'ozone
+ sum(is.na(airquality$Ozone))
+
+## 37 valeurs relatives à la concentration d'ozone manquent dans le jeu de données 'airquality'
+
+# Nombre de valeurs manquantes par variable
+valeurs_manquantes = sapply(1:ncol(airquality), function(j){
+  return(sum(is.na(airquality[, j])))
+})
+names(valeurs_manquantes) = names(airquality)
+valeurs_manquantes
+```
+```{r}
+# 3. Concentration d’ozone moyenne et variance pour les mois de mai, juillet et septembre
+moyenne = tapply(airquality$Ozone, airquality$Month, mean,na.rm=TRUE)
+variance = tapply(airquality$Ozone, airquality$Month, function(x){
+  nn = length(na.omit(x))
+  return (var(na.omit(x))*(nn-1)/nn)
+})
+mois = c("Mai", "Juin", "Juillet", "Aout", "Septembre")
+data.frame(mois, moyenne, variance)
+
+# 4. Diagramme à barres de la concentration moyenne d'ozone par mois.
+barplot(moyenne, names.arg = mois, col = "lightblue", border = "darkgreen", 
+        main = "Concentration moyenne d'ozone par mois", 
+        ylab = "Concentration", xlab = "Mois")
+
+# 5. Boxplot de la concentration moyenne d'ozone par mois.
+boxplot(airquality$Ozone~airquality$Month, col = "lightblue", border = "darkgreen", 
+        main = "Boxplot de la concentration moyenne d'ozone par mois", names = mois,
+        sub = "Source : jeu de données 'airquality' sous R", ylab = "Concentration")
+```
+
+
+# Exercice 2.3.2 (Écrire et charger un jeu de données)
+
+```{r}
+# 2.1. Description du jeu de données 'iris'
+?iris
+## 'iris' est un jeu de données sous R fournissant des informations sur les dimensions en
+## centimètres des sépales et des pétales d'un échantillon de 3 espèces différentes d'iris
+
+# 2.2. Variables du jeu de données
+names(iris)
+
+# 2.3 Dimensions du jeu de données
+dim(iris)
+
+## 150 lignes et 5 colonnes
+
+# 3. Écriture du jeu de données dans le fichier iris.txt
+write.table(iris, file = "iris.txt", row.names = FALSE)
+
+# 4. Chargement des données de 'iris.txt' dans 'iris2'
+iris2 = read.table("iris.txt", header = TRUE)
+head(iris2)
+
+# Indicateurs statistiques par espèces pour chaque valeur quantitative
+moyenne1 = sapply(1:(ncol(iris)-1), function(x) return (tapply(iris[, x], iris$Species, mean)))
+colnames(moyenne1) = names(iris)[-ncol(iris)]
+moyenne1
+
+variance = sapply(1:(ncol(iris)-1), 
+                  function(x) return (tapply(iris[, x], iris$Species,
+                                  function(x){
+                                    n = length(x)
+                                    return (var(x)*(n-1)/n)
+                                  })))
+colnames(variance) = colnames(moyenne1)
+variance
+
+ecart_type = sqrt(variance)
+colnames(ecart_type) = colnames(moyenne1)
+ecart_type
+
+mediane = sapply(1:(ncol(iris)-1), function(x) return (tapply(iris[, x], iris$Species, median)))
+colnames(mediane) = colnames(moyenne1)
+mediane
+
+# apply(T, [1 ou 2], FUN)
+# T -> tableau à deux dimensions
+# 1 -> Parcours de chaque ligne / 2 -> Parcours de chaque colonne
+# FUN -> fonction à appliquer sur la dimension choisie
+moyenne2 = apply(iris[-ncol(iris)], 2, function(x) return (tapply(x, iris[ncol(iris)], mean)))
+as.data.frame(moyenne2)
+```
+
+
+# Quelques graphiques
+```{r}
+x = seq(0, 10, length = 100)
+y = seq(0, 10, length = 100)
+f = function(x, y) return ((0.3/sqrt(2*pi))*exp(-0.5*((x-3)^2+(y-3)^2)) +
+                       (0.7/sqrt(2*pi))*exp(-0.5*((x-6)^2+(y-4)^2)))
+z = outer(x, y, f)
+persp(x, y, z, theta = 15, phi = 0)
+
+# contour(z, nlevels = 10)
+```

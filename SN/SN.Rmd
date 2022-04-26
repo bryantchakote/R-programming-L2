@@ -1,0 +1,139 @@
+---
+title: "SN"
+author: "Bryan Tchakote"
+date: "1/25/2021"
+output:
+  pdf_document:
+    toc: yes # table of contents / table des matières
+  html_document:
+    toc: yes
+    number_sections: yes # Numérotation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# EXERCICE 1
+
+## Manipulation des vecteurs 
+```{r}
+# 1.a
+a = 0:535
+x = a[a %% 3 == 0]
+
+# 1.b
+length(x)
+
+# 1.c
+y = x[x %% 5 == 0]
+
+# 1.d
+which(x %in% y)
+
+# 1.e
+x[(length(x) - 4):length(x)]
+
+# 1.f
+Y = matrix(y, nrow = 6, byrow = TRUE)
+```
+
+## Manipulation d'une matrice
+```{r}
+# 2.a
+A = matrix(c(1, 0, 1, 1, 0, 1, 1, 1, 2, 3, 0, 1, 0, 0, 0, 1), nrow = 4)
+
+# 2.b
+det(A)
+
+# 2.c
+b = c(0, -1, 1, -2)
+solve(A, b)
+
+# 2.d
+C = A[c(-2, -4), -1]
+B = cbind(C[, 3], C[, 1], C[, 2])
+
+# 2.e
+t(B)
+```
+
+# EXERCICE 2
+
+```{r}
+# 1.
+?WorldPhones
+
+# 2.
+
+## 2.a
+ncol(WorldPhones)
+
+## 2.b
+nrow(WorldPhones)
+
+# 3.
+
+## 3.a
+names(WorldPhones[1, ])
+
+## 3.b
+names(WorldPhones[, 1])
+
+# 4.
+summary(WorldPhones)
+
+# 5.
+
+## 5.a
+apply(WorldPhones, 2, sd)
+
+## 5.b
+apply(WorldPhones, 1, sd)
+
+# 6.
+
+## 6.a
+class(WorldPhones)
+
+## 6.b
+temps = as.integer(names(WorldPhones[, 1]))
+
+## 6.c
+africa = WorldPhones[, "Africa"]
+mid_amer = WorldPhones[, "Mid.Amer"]
+
+## 6.d
+plot(temps, africa, col="blue", ylab="", ylim=c(0, 2000), type="l", lty=1,
+     lwd=2, main="Nombre de téléphones en Afrique et en Amérique Centrale
+     entre 1951 et 1961")
+par(new=TRUE)
+plot(temps, mid_amer, col="red", ylab="Nombre de téléphones", ylim=c(0, 2000),
+     type="l", lty=2, lwd=2)
+legend("topleft", legend=c("Afrique", "Amérique Centrale"), lty=c(1, 2),
+       lwd=c(2, 2), col=c("blue", "red"))
+```
+
+
+# EXERCICE 3
+
+```{r}
+# 1.
+tarif0 = function(age){
+  if(age < 0) return("Age invalide")
+  if(age <= 11) return("demi-tarif")
+  if(age > 65) return("tarif senior")
+  return("plein tarif")
+}
+
+# 2.
+sapply(c(7, 55, 17, 75, 90), tarif0)
+
+# 3.
+### tarif0 n'est pas vectorisee (structures conditionnelles)
+
+# 4.
+tarif = function(ages) return(sapply(ages, tarif0))
+tarif(c(7, 55, 17, 75, 90))
+```
+

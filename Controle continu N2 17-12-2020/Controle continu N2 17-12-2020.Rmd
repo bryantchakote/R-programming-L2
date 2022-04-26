@@ -1,0 +1,101 @@
+---
+title: "Contrôle continu N2"
+author: "Bryan Tchakote"
+date: "12/17/2020"
+output:
+  pdf_document:
+    toc: yes
+    number_sections: yes
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Indice de masse corporelle
+
+```{r}
+imc = function (poids, taille) {
+  if(poids <= 0 | taille <= 0) return ("Mauvais format de données")
+  
+  IMC = poids / taille^2
+  
+  if(IMC < 18.5) class = "Poids insuffisant"
+  else if(IMC < 25) class = "Poids normal"
+  else if(IMC < 30) class = "Surpoids ou pré-obésité"
+  else class = "Obésité"
+  
+  resultat = list(IMC = IMC, Classification = class)
+  
+  return (resultat)
+}
+```
+
+
+
+# Variance (estimateur biaisé ou non)
+
+```{r}
+variance = function (X, biaised = "") {
+  n = length(X)
+  
+  if(n <= 1) return ("Données invalides")
+  
+  if(biaised == FALSE | biaised == "") return (var(X))
+      
+  if(biaised == TRUE) return (var(X)*((n - 1) / n))
+}
+```
+
+
+
+# Loi normale centrée réduite
+
+## Fonction de répartition Phi1 pour x <= 0
+
+```{r}
+Phi1 = function (x, n = 50) {
+  if (x > 0) return ("Données invalides")
+  
+  somme = 0
+  
+  for(i in 0:n) {
+    y = prod(seq(1, (2*i +1), 2))
+    
+    elt_somme = x^(2*i + 1) / y
+    somme = somme + elt_somme
+  }
+  
+  phi1 = 1 / (2*(1 - somme))
+  
+  return (phi1)
+}
+```
+
+
+## Valeurs de Phi pour tout x
+
+```{r}
+Phi = function (X, n = 50) {
+  return(
+    sapply(X, function(u){
+      if (u > 0) phi = 1 - Phi1(-u)
+      else phi = Phi1(u)
+      return (phi)
+    })
+  )
+}
+```
+
+
+## Courbes représentatives
+
+```{r}
+curve(Phi, xlim = c(-10, 10), col = "blue", xlab = "", ylab = "", lwd = 3)
+par(new = TRUE)
+curve(pnorm, xlim = c(-10, 10), col = "red", xlab = "x", ylab = "Phi(x)", type="p")
+legend(-10, 1, legend = c("Phi", "pnorm"), pch = c(1, 1), lty = c(0, 1), col = c("blue", "red"))
+```

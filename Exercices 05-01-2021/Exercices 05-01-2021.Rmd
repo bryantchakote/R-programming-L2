@@ -1,0 +1,395 @@
+---
+title: "Exercices R"
+author: "Bryan Tchakote"
+date: "1/5/2021"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercice 1 (manipulation de vecteurs)
+
+## Création du vecteur x
+
+```{r}
+(x = 1:5)
+```
+
+## Mode et longueur de x
+
+```{r}
+mode_x = mode(x)
+longueur_x = length(x)
+
+cat("Mode de x :", mode_x, "\nLongueur de x :", longueur_x)
+```
+
+## Extraction du premier et du dernier élément de x
+
+```{r}
+premier_x = x[1]
+dernier_x = x[length(x)]
+
+cat("Premier élément de x:", premier_x, "\nDernier élément de x:", dernier_x)
+```
+
+## Extraction des 3 premiers éléments de x (résultat dans a)
+
+```{r}
+a = x[1:3]
+cat("a =", a)
+```
+
+## Extraction des éléments en position 1, 3, 5 (résultat dans b)
+
+```{r}
+b = x[c(1, 3, 5)]
+cat("b = ", b)
+```
+
+## Addition de x et 10, multiplication du resultat par 2
+
+```{r}
+(x + 10) * 2
+```
+
+## Addition de a et b et commentaire
+
+```{r}
+a + b
+```
+
+- Commentaire : L'addition s'effectue membre par membre
+
+## Addition x + a, commentaire, addition a + x
+
+```{r}
+x + a
+```
+
+- Commentaires :
+
+  - L'addition se fait membre par membre, en bouclant sur les éléments de a étant donné que ce vecteur est de taille inférieure
+  - Un message d'avertissement signale que la taille du plus long vecteur (x) n'est pas un multiple de la taille du plus petit vecteur (a)
+  
+```{r}
+a + x
+```
+
+- Commentaire : (a + x) = (x + a)
+
+## Multiplication de x par c = 2
+
+```{r}
+c = 2
+x_mul_c = x * c
+cat("x = ", x, "\nx * c = x * 2 =", x_mul_c)
+```
+
+## Multiplication de a par b
+
+```{r}
+a_mul_b = a * b
+cat("\na = ", a, "\nb = ", b, "\na * b =", a_mul_b)
+```
+
+- Commentaire : La multiplication s'effectue membre par membre
+
+## Multiplication de x par a
+
+```{r}
+x_mul_a = x * a
+cat("\nx = ", x, "\na = ", a, "\nx * a =", x_mul_a)
+```
+
+- Commentaires :
+
+  - La multiplication se fait membre par membre, en bouclant sur les éléments de a étant donne que ce vecteur est de taille inférieure
+  - Un message d'avertissement signale que la taille du vecteur le plus long (x) n'est pas un multiple de la taille du vecteur le plus court (a)
+
+## Récuperation des positions des multiples de 2 (résultat dans ind) et des multiples de 2 (résultat dans mult_2) dans x
+
+```{r}
+ind = which(x %% 2 == 0)
+mult_2 = x[x %% 2 == 0]
+
+cat("Positions des multiples de 2 :", ind, "\nMultiples de 2 :", mult_2)
+```
+
+## Affichage des éléments de x multiples de 3 et multiples de 2
+
+```{r}
+x[x %% 3 == 0 & x %% 2 == 0]
+```
+
+## Affichage des éléments de x multiples de 3 ou multiples de 2
+
+```{r}
+x[x %% 3 == 0 | x %% 2 == 0]
+```
+
+## Somme des éléments de x
+
+```{r}
+sum(x)
+```
+
+## Remplacement du premier élément de x par 4
+
+```{r}
+x[1] = 4
+x
+```
+
+## Remplacement du premier élément de x par NA, recalcul de la somme des éléments de x
+
+```{r}
+x[1] = NA
+sum(x)
+```
+  
+## Liste des objets en mémoire dans la session R
+
+```{r}
+objets_memoire = ls()
+objets_memoire
+```
+
+## Suppression du vecteur
+
+```{r}
+rm(x)
+```
+
+## Suppression de la totalité des objets de la session
+
+```{r}
+rm(list = ls())
+```
+
+
+
+
+
+# Exercice 2 (manipulation de listes)
+
+## Evaluation du code
+
+```{r}
+TRUE + FALSE + TRUE * 4
+```
+
+- Commentaire : R caste *TRUE* et *FALSE* en entiers (1 et 0 respectivement), puisque les autres termes de l'expression sont de type **numeric**. Le code ci-dessus correspond donc à l'opération $1 + 0 + 1 * 4$, d'où le résultat *5*.
+
+## Evaluation des expressions
+
+```{r}
+c(1, 4, TRUE)
+```
+
+- Commentaire : R caste *TRUE* en entier (1), puisque les autres termes de l'expression sont de type **numeric**.
+
+```{r}
+c(1, 4, TRUE, "bonjour")
+```
+
+- Commentaire : Les éléments de ce vecteur sont tous castés en chaîne de caractère, la transformation en entiers échoue à cause du dernier élément, "bonjour".
+
+## Création de la liste l
+
+```{r}
+l = list(1, 4, TRUE)
+```
+
+## Mode du premier et du troisième élément de l
+
+```{r}
+premier_elt = l[[1]]
+mode_prem_elt = mode(premier_elt)
+
+dernier_elt = l[[length(l)]]
+mode_dern_elt = mode(dernier_elt)
+
+element = c(premier_elt, dernier_elt)
+mode = c(mode_prem_elt, mode_dern_elt)
+
+cat("Premier élément :", premier_elt, " - Mode :", mode_prem_elt,
+    "\nDernier élément :", dernier_elt, " - Mode :", mode_dern_elt)
+```
+
+## Ajout d'un élément à la liste
+
+```{r}
+l[[length(l) + 1]] = "bonjour"
+```
+
+## Retrait du 3e élément de l
+
+```{r}
+l[-3]
+```
+
+## Création de la liste moi
+
+```{r}
+moi = list(nom = "Tchakote", prenom = "Bryan", annee_de_naisssance = "13-06-2002")
+```
+
+## Extraction du prénom de la liste
+
+```{r}
+# En utilisant l'indice
+moi[[2]]
+```
+
+```{r}
+# En utilisant le nommage
+moi$prenom
+```
+
+## Création des listes "toi" et "personnes"
+
+```{r}
+toi = list(nom = "Kenne", prenom = "Alice", annee_de_naisssance = "21-02-1979")
+
+personnes = list(toi, moi)
+```
+
+## Extraction de "toi" de la liste "personnes"
+
+```{r}
+personnes[[1]]
+```
+
+## Extraction depuis "personnes" du prénom de l'élément en première position
+
+```{r}
+personnes[[1]][2]
+```
+
+
+
+
+# Exercice 3 (manipulation de matrices)
+
+## Création de la matrice A
+
+```{r}
+A = matrix(c(-3, -1, 1, 5, 2, -1, 6, 2, -1), nrow = 3)
+```
+
+## Dimensions, nombre de lignes et de colonnes, longueur de A
+
+```{r}
+dimensions_A = dim(A)
+n_lignes_A = nrow(A)
+n_colonnes_A = ncol(A)
+long_A = length(A)
+
+cat("Dimensions :", dimensions_A, "\nNombre de lignes :", n_lignes_A, "\nNombre de colonnes :", n_colonnes_A, "\nLongueur :", long_A)
+```
+
+## Extraction de la seconde colonne et de la première ligne de A
+
+```{r}
+sec_col = A[, 2]
+prem_lig = A[1, ]
+
+cat("Seconde colonne de A :", sec_col, "\nPremière ligne de A :", prem_lig)
+```
+
+## Extraction de l'élément en 3e position à la première ligne
+
+```{r}
+elt_1_3 = prem_lig[3]
+elt_1_3
+```
+
+## Extraction de la sous matrice de dimension 2 X 2 du coin inférieur de A
+
+```{r}
+A[-1, -1]
+```
+
+## Somme des colonnes et des lignes de A
+
+```{r}
+somme_colonnes = apply(A, 2, sum)
+somme_lignes = apply(A, 1, sum)
+
+cat("Somme des colonnes :", somme_colonnes, "\nSomme des lignes :", somme_lignes)
+```
+
+## Affichage de la diagonale de A
+
+```{r}
+diag(A)
+```
+
+## Création de B par ajout d'un vecteur a A
+
+```{r}
+B = cbind(A, 1:3)
+```
+
+## Retrait du quatrième vecteur de B
+
+```{r}
+B = B[, -4]
+```
+
+## Retrait de la première et de la troisième ligne de B
+
+```{r}
+B[-c(1, 3), ]
+```
+
+## Ajout de 10 à A
+
+```{r}
+A = A + 10
+```
+
+## Ajout du vecteur à A
+
+```{r}
+A = A + 1:3
+```
+
+## Ajout de la matrice identité à A
+
+```{r}
+I3 = matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), nrow = 3)
+A = A + I3
+```
+
+## Division des éléments de A par 2
+
+```{r}
+A = A / 2
+```
+
+## Multiplication de A par le vecteur
+
+```{r}
+A = A * 1:3
+```
+
+## Transposée de A
+
+```{r}
+crossprod(A)
+```
+
+## Produit de A par sa transposée
+
+```{r}
+A %*% crossprod(A)
+```
